@@ -72,7 +72,9 @@ final class MovieQuizViewController: UIViewController {
                 text: "Рейтинг этого фильма больше чем 6?",
                 correctAnswer: false)
         ]
-    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
     /// метод конвертации, который принимает моковый вопрос и возвращает вью модель для экрана вопроса
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         let questionStep = QuizStepViewModel(
