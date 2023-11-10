@@ -24,6 +24,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         counterLabel.text = step.questionNumber
     }
     
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var yesButtonAnswer: UIButton!
     @IBOutlet weak var noButtonAnswer: UIButton!
     @IBOutlet private var imageView: UIImageView!
@@ -122,6 +123,32 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
         )
         alertPresenter?.show(alertModel: alertModel)
+    }
+    
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
+    }
+    
+    private func hideLoadingIndicator() {
+        activityIndicator.isHidden = true
+    }
+    
+    private func showNetworkError(message: String) {
+        hideLoadingIndicator()
+        let alertNetworkError = AlertModel(title: "Ошибка",
+                                           message: "Что-то пошло не так",
+                                           buttonText: "Попробовать ещё раз",
+                                           buttonAction: { [weak self] in
+            guard let self = self else { return }
+            
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            self.questionFactory.requestNextQuestion()
+
+        }
+        )
+        alertPresenter?.show(alertModel: alertNetworkError)
     }
     
     private func makeButtonsEnabled(_ isEnabled: Bool) {
