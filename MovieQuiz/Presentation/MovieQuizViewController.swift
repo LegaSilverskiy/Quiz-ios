@@ -11,11 +11,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     /// метод конвертации, который принимает моковый вопрос и возвращает вью модель для экрана вопроса
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        let questionStep = QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(),
+        return QuizStepViewModel(
+            image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
-        return questionStep
     }
     /// приватный метод вывода на экран вопроса, который принимает на вход вью модель вопроса и ничего не возвращает
     private func show(quiz step: QuizStepViewModel) {
@@ -31,7 +30,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
     private let questionsAmount: Int = 10
-    private var questionFactory: QuestionFactoryProtocol = QuestionFactory()
+    private var questionFactory: QuestionFactory?
     private var currentQuestion: QuizQuestion?
     private var alertPresenter: AlertPresenter?
     private var statisticService: StatisticService?
@@ -39,13 +38,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         print(Bundle.main.bundlePath)
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         statisticService = StatisticServiceImp()
         alertPresenter = AlertPresenter(viewController: self)
-        questionFactory.delegate = self
+        questionFactory?.delegate = self
         self.currentQuestionIndex = 0
         self.correctAnswers = 0
         
-        questionFactory.requestNextQuestion()
+        showLoadingIndicator()
+        questionFactory?.loadData()
         imageView.layer.cornerRadius = 20 /// радиус скругления углов рамки
         
     }
@@ -62,8 +63,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self?.show(quiz: viewModel)
         }
     }
-    
-    
     
     /// приватный метод, который меняет цвет рамки
     /// принимает на вход булевое значение и ничего не возвращает
@@ -95,7 +94,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             showFinalResults()
         } else {
             currentQuestionIndex += 1
-            self.questionFactory.requestNextQuestion()
+            self.questionFactory?.requestNextQuestion()
             noButtonAnswer.isEnabled = true
             yesButtonAnswer.isEnabled = true
         }
@@ -117,7 +116,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             guard let self = self else { return }
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
-            self.questionFactory.requestNextQuestion()
+            self.questionFactory?.requestNextQuestion()
             
             makeButtonsEnabled(true)
         }
@@ -144,11 +143,20 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
-            self.questionFactory.requestNextQuestion()
+            self.questionFactory?.requestNextQuestion()
 
         }
         )
         alertPresenter?.show(alertModel: alertNetworkError)
+    }
+    
+    func didLoadDataFromServer() {
+        activityIndicator.isHidden = true
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription)
     }
     
     private func makeButtonsEnabled(_ isEnabled: Bool) {
