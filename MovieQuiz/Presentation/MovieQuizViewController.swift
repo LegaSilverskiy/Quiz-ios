@@ -61,7 +61,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self?.show(quiz: viewModel)
         }
     }
-
+    
     
     
     /// приватный метод, который меняет цвет рамки
@@ -104,13 +104,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private func showFinalResults() {
         statisticService?.store(correct: correctAnswers, total: questionsAmount)
         
-        guard let bestGame = statisticService?.bestGame else {
+        guard let message = makeResultMessage() else {
             assertionFailure("Error message")
             return
         }
         
         let alertModel = AlertModel(title: "Этот раунд окончен!",
-                                    message: makeResultMessage(),
+                                    message: message,
                                     buttonText: "Сыграть ещё раз",
                                     buttonAction: { [weak self] in
             guard let self = self else { return }
@@ -129,7 +129,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         yesButtonAnswer.isEnabled = isEnabled
     }
     
-    private func makeResultMessage () -> String {
+    private func makeResultMessage () -> String? {
         guard let statisticService = statisticService, let bestGame = statisticService.bestGame else {
             assertionFailure("error message")
             return ""
