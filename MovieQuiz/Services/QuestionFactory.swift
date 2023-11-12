@@ -73,6 +73,7 @@ final class  QuestionFactory: QuestionFactoryProtocol {
      text: "Рейтинг этого фильма больше чем 6?",
      correctAnswer: false)
      ] */
+    
     func requestNextQuestion() {
         DispatchQueue.global().async { [weak self] in
             guard let self = self else { return }
@@ -81,7 +82,7 @@ final class  QuestionFactory: QuestionFactoryProtocol {
             guard let movie = self.movies[safe: index] else { return }
             
             var imageData = Data()
-            
+            //TODO: issue an alert if there is no image.
             do {
                 imageData = try Data(contentsOf: movie.resizedImageURL)
             } catch {
@@ -89,9 +90,12 @@ final class  QuestionFactory: QuestionFactoryProtocol {
             }
             
             let rating = Float(movie.rating) ?? 0
+            //TODO: Complete an algorithm that will randomly generate questions.
             
-            let text = "Рейтинг этого фильма больше чем 7?"
-            let correctAnswer = rating > 7
+            let ratingNumber: [Int] = [6, 7, 8, 9]
+            guard let ratingAnswer = ratingNumber.randomElement() else { return }
+            let text = "Рейтинг этого фильма больше чем \(ratingAnswer)?"
+            let correctAnswer = rating > Float(ratingAnswer)
             
             let question = QuizQuestion(image: imageData,
                                         text: text,

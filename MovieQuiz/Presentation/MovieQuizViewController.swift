@@ -22,8 +22,22 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
     }
+    /// hide image, buttons and text before load data
+    private func hideUI () {
+        imageView.backgroundColor = UIColor.ypBlack
+        yesButtonAnswer.backgroundColor = UIColor.ypBlack
+        noButtonAnswer.backgroundColor = UIColor.ypBlack
+        textLabel.textColor = UIColor.ypBlack
+    }
+    /// show image, buttons and text after load data
+    private func showUI () {
+        imageView.backgroundColor = UIColor.ypGray
+        yesButtonAnswer.backgroundColor = UIColor.ypGray
+        noButtonAnswer.backgroundColor = UIColor.ypGray
+        textLabel.textColor = UIColor.ypWhite
+    }
     
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var yesButtonAnswer: UIButton!
     @IBOutlet weak var noButtonAnswer: UIButton!
     @IBOutlet private var imageView: UIImageView!
@@ -37,7 +51,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        hideUI()
         print(Bundle.main.bundlePath)
+        activityIndicator.hidesWhenStopped = true
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         statisticService = StatisticServiceImp()
         alertPresenter = AlertPresenter(viewController: self)
@@ -45,9 +61,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         self.currentQuestionIndex = 0
         self.correctAnswers = 0
         
+        
         showLoadingIndicator()
         questionFactory?.loadData()
-        imageView.layer.cornerRadius = 20 /// радиус скругления углов рамки
+        imageView.layer.cornerRadius = 20
         
     }
     // MARK: - QuestionFactoryDelegate
@@ -64,9 +81,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
-    /// приватный метод, который меняет цвет рамки
-    /// принимает на вход булевое значение и ничего не возвращает
     private func showAnswerResult(isCorrect: Bool) {
+        hideLoadingIndicator()
         if isCorrect {
             correctAnswers += 1
         }
@@ -81,18 +97,19 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
         noButtonAnswer.isEnabled = false
         yesButtonAnswer.isEnabled = false
+        showLoadingIndicator()
         
     }
     
     
-    /// приватный метод, который содержит логику перехода в один из сценариев
-    /// метод ничего не принимает и ничего не возвращает
     private func showNextQuestionOrResults() {
         imageView.layer.borderWidth = 0
-        
+        showLoadingIndicator()
         if currentQuestionIndex == questionsAmount - 1 {
+            hideLoadingIndicator()
             showFinalResults()
         } else {
+            hideLoadingIndicator()
             currentQuestionIndex += 1
             self.questionFactory?.requestNextQuestion()
             noButtonAnswer.isEnabled = true
@@ -125,12 +142,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func showLoadingIndicator() {
-        activityIndicator.isHidden = false
+        
         activityIndicator.startAnimating()
     }
     
     private func hideLoadingIndicator() {
-        activityIndicator.isHidden = true
+        activityIndicator.stopAnimating()
     }
     
     private func showNetworkError(message: String) {
@@ -143,15 +160,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
-            self.questionFactory?.requestNextQuestion()
-
+            self.questionFactory?.loadData()
+            
         }
         )
         alertPresenter?.show(alertModel: alertNetworkError)
     }
     
     func didLoadDataFromServer() {
-        activityIndicator.isHidden = true
+        showUI()
+        hideLoadingIndicator()
         questionFactory?.requestNextQuestion()
     }
     
