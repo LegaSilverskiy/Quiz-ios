@@ -24,17 +24,17 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     /// hide image, buttons and text before load data
     private func hideUI () {
-        imageView.backgroundColor = UIColor.ypBlack
-        yesButtonAnswer.backgroundColor = UIColor.ypBlack
-        noButtonAnswer.backgroundColor = UIColor.ypBlack
-        textLabel.textColor = UIColor.ypBlack
+        imageView.isHidden = true
+        yesButtonAnswer.isHidden = true
+        noButtonAnswer.isHidden = true
+        textLabel.isHidden = true
     }
     /// show image, buttons and text after load data
     private func showUI () {
-        imageView.backgroundColor = UIColor.ypGray
-        yesButtonAnswer.backgroundColor = UIColor.ypGray
-        noButtonAnswer.backgroundColor = UIColor.ypGray
-        textLabel.textColor = UIColor.ypWhite
+        imageView.isHidden = false
+        yesButtonAnswer.isHidden = false
+        noButtonAnswer.isHidden = false
+        textLabel.isHidden = false
     }
     
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
