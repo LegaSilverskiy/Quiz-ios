@@ -16,12 +16,19 @@ final class MovieQuizPresenter {
     var currentQuestion: QuizQuestion?
     var questionFactory: QuestionFactory?
     
+    func didAnswer(isCorrectAnswer: Bool) {
+        if isCorrectAnswer {
+            correctAnswers += 1
+        }
+    }
+    
     func isLastQuesiton() -> Bool {
         currentQuestionIndex == questionAmount - 1
     }
     
-    func resetQuestionIndex() {
+    func restartGame() {
         currentQuestionIndex = 0
+        correctAnswers = 0
     }
     
     func switchToNextQuestion() {
@@ -86,11 +93,11 @@ final class MovieQuizPresenter {
                                     buttonText: "Сыграть ещё раз",
                                     buttonAction: { [weak self] in
             guard let self = self else { return }
-            resetQuestionIndex()
+            restartGame()
             correctAnswers = 0
             questionFactory?.loadData()
             
-//            makeButtonsEnabled(true)
+            //            makeButtonsEnabled(true)
         }
         )
         viewController?.alertPresenter?.show(alertModel: alertModel)

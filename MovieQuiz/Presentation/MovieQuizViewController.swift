@@ -6,11 +6,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
-    func show(quiz step: QuizStepViewModel) {
-        imageView.image = step.image
-        textLabel.text = step.question
-        counterLabel.text = step.questionNumber
-    }
     /// hide image, buttons and text before load data
     private func hideUI () {
         imageView.isHidden = true
@@ -49,9 +44,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         alertPresenter = AlertPresenter(viewController: self)
         questionFactory?.delegate = self
         presenter.viewController = self
-        self.presenter.resetQuestionIndex()
-        presenter.correctAnswers = 0
-        
+        self.presenter.restartGame()
         
         showLoadingIndicator()
         questionFactory?.loadData()
@@ -67,10 +60,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     func showAnswerResult(isCorrect: Bool) {
         hideLoadingIndicator()
-        if isCorrect {
-            presenter.correctAnswers += 1
-        }
-        
+        presenter.didAnswer(isCorrectAnswer: isCorrect)
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
@@ -103,6 +93,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
+    func show(quiz step: QuizStepViewModel) {
+        imageView.image = step.image
+        textLabel.text = step.question
+        counterLabel.text = step.questionNumber
+    }
+    
     func showLoadingIndicator() {
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
@@ -121,8 +117,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                                            buttonAction: { [weak self] in
             guard let self = self else { return }
             
-            self.presenter.resetQuestionIndex()
-            self.presenter.correctAnswers = 0
+            self.presenter.restartGame()
             self.questionFactory?.loadData()
             
         }
