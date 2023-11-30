@@ -39,22 +39,13 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     }
     
     // MARK: - Private functions
-    
-    func hideUI () {
-        imageView.isHidden = true
-        yesButtonAnswer.isHidden = true
-        noButtonAnswer.isHidden = true
-        textLabel.isHidden = true
-        counterLabel.isHidden = true
-        questionLabel.isHidden = true
-    }
-    func showUI () {
-        imageView.isHidden = false
-        yesButtonAnswer.isHidden = false
-        noButtonAnswer.isHidden = false
-        textLabel.isHidden = false
-        counterLabel.isHidden = false
-        questionLabel.isHidden = false
+    func changeStateUI (isHidden: Bool) {
+        imageView.isHidden = isHidden
+        yesButtonAnswer.isHidden = isHidden
+        noButtonAnswer.isHidden = isHidden
+        textLabel.isHidden = isHidden
+        counterLabel.isHidden = isHidden
+        questionLabel.isHidden = isHidden
     }
     
     
@@ -115,29 +106,22 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     func hideLoadingIndicator() {
         activityIndicator.isHidden = true
     }
-    
-    func buttonsActive() {
-        yesButtonAnswer.isEnabled = true
-        noButtonAnswer.isEnabled = true
-    }
-    func buttonsDontActive() {
-        yesButtonAnswer.isEnabled = false
-        noButtonAnswer.isEnabled = false
+    func changeStateButton(isEnabled: Bool) {
+        yesButtonAnswer.isEnabled = isEnabled
+        noButtonAnswer.isEnabled = isEnabled
     }
     
     func showNetworkError(message: String) {
         hideLoadingIndicator()
-        let alertNetworkError = AlertModel(title: "Ошибка",
-                                           message: "Что-то пошло не так",
-                                           buttonText: "Попробовать ещё раз",
-                                           buttonAction: { [weak self] in
-            guard let self = self else { return }
-            
-            self.presenter.restartGame()
-            
-        }
+        let alertNetworkError = AlertModel(
+            title: "Ошибка",
+            message: "Что-то пошло не так",
+            buttonText: "Попробовать ещё раз",
+            buttonAction: { [weak self] in
+                guard let self = self else { return }
+                self.presenter.restartGame()
+            }
         )
-        
         show(alertModel: alertNetworkError)
     }
 }

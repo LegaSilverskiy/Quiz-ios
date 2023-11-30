@@ -25,14 +25,14 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
 
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         questionFactory?.loadData()
-        viewController.hideUI()
+        viewController.changeStateUI(isHidden: true)
         viewController.showLoadingIndicator()
     }
 
     // MARK: - QuestionFactoryDelegate
 
     func didLoadDataFromServer() {
-        viewController?.showUI()
+        viewController?.changeStateUI(isHidden: false)
         viewController?.hideLoadingIndicator()
         questionFactory?.requestNextQuestion()
     }
@@ -98,7 +98,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         let givenAnswer = isYes
 
         proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
-        viewController?.buttonsDontActive()
+        viewController?.changeStateButton(isEnabled: false)
     }
 
     private func proceedWithAnswer(isCorrect: Bool) {
@@ -109,7 +109,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             self.proceedToNextQuestionOrResults()
-            viewController?.buttonsActive()
+            viewController?.changeStateButton(isEnabled: true)
         }
     }
 
